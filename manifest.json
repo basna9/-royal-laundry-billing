@@ -1,0 +1,11 @@
+{
+  "name": "Royal Laundry Billing",
+  "short_name": "Royal Billing",
+  "description": "Royal Laundry & Dry Cleaners shared billing app",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f7fb",
+  "theme_color": "#145da0",
+  "icons": []
+}

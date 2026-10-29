@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#145da0">
+  <meta name="description" content="Royal Laundry & Dry Cleaners billing app">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
+  <title>Royal Laundry Billing</title>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-mark">R</div>
+    <div><strong>Royal Laundry</strong><small>& Dry Cleaners</small></div>
+    <button id="logoutBtn" class="quiet hidden">Log out</button>
+  </header>
+  <main>
+    <section id="authView" class="auth-card">
+      <p class="eyebrow">BILLING MADE SIMPLE</p><h1>Welcome back</h1>
+      <p class="muted">Sign in to access your shared laundry bills.</p>
+      <form id="authForm">
+        <label>Username (display name)<input id="username" autocomplete="username" placeholder="e.g. royalowner" required></label>
+        <label>Email<input id="email" type="email" autocomplete="email" placeholder="you@example.com" required></label>
+        <label>Password<input id="password" type="password" autocomplete="current-password" minlength="8" required></label>
+        <div class="auth-actions"><button type="submit" id="signInBtn">Sign in</button><button type="button" id="signUpBtn" class="secondary">Create account</button></div>
+      </form>
+      <p class="small muted">For this starter, email + password is the secure sign-in method. Username-only sign-in needs a secure server function.</p>
+      <p id="authMessage" class="message" role="status"></p>
+    </section>
+
+    <section id="appView" class="hidden">
+      <div class="welcome-row"><div><p class="eyebrow">ROYAL LAUNDRY & DRY CLEANERS</p><h1 id="pageTitle">New bill</h1></div><span class="online-pill" id="syncStatus">Online</span></div>
+      <nav class="tabs" aria-label="Main pages">
+        <button class="tab active" data-page="new">＋ New Bill</button>
+        <button class="tab" data-page="saved">▤ Saved Bills</button>
+        <button class="tab" data-page="settings">⚙ Settings</button>
+      </nav>
+
+      <section id="newPage" class="page">
+        <form id="billForm" class="panel">
+          <div class="section-head"><div><h2>Customer details</h2><p class="muted">Enter the details for this receipt.</p></div><span class="bill-chip" id="billNumberChip">Bill # —</span></div>
+          <div class="fields two">
+            <label>Customer name<input id="customerName" required placeholder="Customer name"></label>
+            <label>Phone number<input id="customerPhone" inputmode="tel" placeholder="Phone number"></label>
+            <label>Bill date<input id="billDate" type="date" required></label>
+            <label>Delivery date<input id="deliveryDate" type="date"></label>
+          </div>
+          <div class="section-head items-head"><div><h2>Items</h2><p class="muted">Add each item and its service rates.</p></div><button id="addItemBtn" class="secondary" type="button">＋ Add item</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Item</th><th>Qty</th><th>Washing ₹</th><th>Ironing ₹</th><th>Dry clean ₹</th><th>Total</th><th></th></tr></thead><tbody id="itemsBody"></tbody></table></div>
+          <div class="total-row"><span>Grand total</span><strong id="grandTotal">₹0.00</strong></div>
+          <label>Notes (optional)<textarea id="notes" rows="2" placeholder="Special instructions"></textarea></label>
+          <div class="button-row"><button type="submit" id="saveBillBtn">Save bill</button><button type="button" class="secondary" id="resetBillBtn">Clear form</button></div>
+          <p id="billMessage" class="message" role="status"></p>
+        </form>
+        <section class="panel receipt" id="receiptPreview">
+          <p class="eyebrow">RECEIPT PREVIEW</p><h2>ROYAL LAUNDRY & DRY CLEANERS</h2>
+          <p>Areekode · HO: Amayur</p><p>Phone: 7994016808</p><hr>
+          <div class="receipt-meta"><span>Bill: <b id="previewBillNo">—</b></span><span>Date: <b id="previewDate">—</b></span></div>
+          <p>Customer: <b id="previewCustomer">—</b></p><p>Phone: <b id="previewPhone">—</b></p>
+          <div class="table-wrap"><table><thead><tr><th>Item</th><th>Qty</th><th>Amount</th></tr></thead><tbody id="previewItems"></tbody></table></div>
+          <div class="total-row"><span>Total</span><strong id="previewTotal">₹0.00</strong></div>
+          <p>Delivery date: <b id="previewDelivery">—</b></p><p class="signature">Customer signature: __________________</p>
+          <button id="printBtn" type="button" class="secondary no-print">Print / Save PDF</button>
+        </section>
+      </section>
+
+      <section id="savedPage" class="page hidden">
+        <section class="panel"><div class="section-head"><div><h2>Saved bills</h2><p class="muted">Bills belonging to this account.</p></div></div>
+          <input id="searchBills" placeholder="Search bill number, customer, phone or date">
+          <div id="savedBills" class="saved-list"><p class="muted">Loading bills…</p></div>
+        </section>
+      </section>
+
+      <section id="settingsPage" class="page hidden">
+        <section class="panel"><h2>Account & device</h2><p id="accountInfo" class="muted"></p>
+          <h3>Link another phone</h3><p class="muted">The secure one-time linking flow is planned but not enabled in this starter. Do not use an improvised code to share access.</p>
+          <button type="button" class="secondary" id="linkInfoBtn">How linking will work</button><p id="linkInfo" class="message"></p>
+          <hr><h3>Data safety</h3><p class="muted">Bills are stored in the cloud. Keep your login secure and make regular backups once backup/export is implemented.</p>
+        </section>
+      </section>
+    </section>
+  </main>
+  <footer>Royal Laundry & Dry Cleaners · Billing app</footer>
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
