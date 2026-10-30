@@ -99,8 +99,37 @@ function setPage(name) {
     let result;
     if(currentBillId) result=await sb.from("bills").update(payload).eq("id",currentBillId).select().single();
     else result=await sb.from("bills").insert(payload).select().single();
-    if(result.error){message("billMessage",authError(result.error),true);return;}
-    currentBillId=result.data.id; message("billMessage","Bill saved successfully."); await loadBills(); updatePreview();
+    if(result.error){message("billMessage",authError(result.error),true);currentBillId = result.data.id;
+
+const shareToken = result.data.share_token;
+
+message("billMessage", "Bill saved successfully.");
+
+await loadBills();
+updatePreview();
+
+if (shareToken && $("customerPhone").value.trim()) {
+  const billLink = window.location.origin +
+    "/view-bill.html?token=" + shareToken;
+
+  const smsText = encodeURIComponent(
+    "Royal Laundry & Dry Cleaners\n" +
+    "Your bill is ready!\n" +
+    "Bill No: " + (result.data.bill_number || currentBillId) + "\n" +
+    "Total: " + money(result.data.total) + "\n" +
+    "View your bill: " + billLink +
+    "\nThank you!"
+  );
+
+  const phone = $("customerPhone").value.trim();
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+const smsLink = isIOS
+  ? "sms:" + phone + "&body=" + smsText
+  : "sms:" + phone + "?body=" + smsText;
+
+window.location.href = smsLink;
+}
   });
   async function loadBills(){
     if(!sb||!currentUser){billsCache=[];renderSaved();return;}
