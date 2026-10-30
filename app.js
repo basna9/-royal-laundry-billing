@@ -13,7 +13,8 @@
   function message(id, text, error=false){ const el=$(id); if(el){el.textContent=text;el.style.color=error?"#b42318":"#145da0";} }
   function showAuth(){ $("authView").classList.remove("hidden"); $("appView").classList.add("hidden"); $("logoutBtn").classList.add("hidden"); }
   function showApp(user){ currentUser=user; $("authView").classList.add("hidden"); $("appView").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden"); $("accountInfo").textContent="Signed in as "+(user.email||"account"); setPage("new"); loadBills(); }
-  function setPage(name){ document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden")); $(name+"Page").classList.remove("hidden"); document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.page===name)); $("pageTitle").textContent=({new:"New bill",saved:"Saved bills",settings:"Settings"})[name]; if(name==="saved") renderSaved(); }
+  function setPage(name){ document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden")); $(name+"Page").classList.remove("hidden"); document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.page===name)); $("pageTitle").textContent=({new:"New bill",saved:"Saved bills",settings:"Settings"})[name]; if(name==="saved") renderSaved();
+if(name==="journal") loadJournal();
   document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
   $("billDate").value=isoToday();
   function addItem(item={name:"",qty:1,wash:0,iron:0,dry:0}){
@@ -111,4 +112,124 @@
   if(sb){sb.auth.getSession().then(({data})=>data.session?showApp(data.session.user):showAuth());}
   else {showAuth();message("authMessage","Demo source loaded. Configure Supabase to enable account login and cloud saving.");}
   addItem();
+  
+  // JOURNAL & EXPENSES
+  async function loadJournal() {
+    if (!sb || !currentUser) {
+      message("expenseMessage", "Please sign in to use the Journal.", true);
+      return;
+    }
+
+    const day = $("journalDate").value || isoToday();
+    const month = $("ledgerMonth").value || day.slice(0, 7);
+    const monthStart = month + "-01";
+    const lastDay = new Date(
+      Number(month.slice(0, 4)),
+      Number(month.slice(5, 7)),
+      0
+    ).getDate();
+    const monthEnd = month + "-" + String(lastDay).padStart(2, "0");
+
+    const [dayBills, dayExpenses, monthBills, monthExpenses] =
+      await Promise.all([
+        sb.from("bills").select("total,bill_date")
+          .eq("owner_id", currentUser.id).eq("bill_date", day),
+        sb.from("expenses").select("amount,expense_date")
+          .eq("owner_id", currentUser.id).eq("expense_date", day),
+        sb.from("bills").select("total,bill_date")
+          .eq("owner_id", currentUser.id)
+          .gte("bill_date", monthStart).lte("bill_date", monthEnd),
+        sb.from("expenses").select("amount,expense_date,category,description,payment_method")
+          .eq("owner_id", currentUser.id)
+          .gte("expense_date", monthStart).lte("expense_date", monthEnd)
+      ]);
+
+    const error = dayBills.error || dayExpenses.error ||
+      monthBills.error || monthExpenses.error;
+
+    if (error) {
+      message("expenseMessage", "Could not load journal: " + error.message, true);
+      return;
+    }
+
+    const income = (dayBills.data || []).reduce((s, b) => s + Number(b.total || 0), 0);
+    const expenses = (dayExpenses.data || []).reduce((s, e) => s + Number(e.amount || 0), 0);
+
+    $("journalIncome").textContent = money(income);
+    $("journalExpenses").textContent = money(expenses);
+    $("journalProfit").textContent = money(income - expenses);
+
+    const monthlyIncome = (monthBills.data || []).reduce((s, b) => s + Number(b.total || 0), 0);
+    const monthlyExpenses = (monthExpenses.data || []).reduce((s, e) => s + Number(e.amount || 0), 0);
+
+    $("ledgerSummary").textContent =
+      "Bill income: " + money(monthlyIncome) +
+      " | Expenses: " + money(monthlyExpenses) +
+      " | Balance: " + money(monthlyIncome - monthlyExpenses);
+
+    const rows = [
+      ...(monthBills.data || []).map(b => ({
+        date: b.bill_date, type: "Bill income",
+        description: "Laundry bill", amount: Number(b.total || 0)
+      })),
+      ...(monthExpenses.data || []).map(e => ({
+        date: e.expense_date, type: "Expense",
+        description: (e.category || "") + " " + (e.description || ""),
+        amount: -Number(e.amount || 0)
+      }))
+    ].sort((a, b) => b.date.localeCompare(a.date));
+
+    $("ledgerBody").innerHTML = rows.length
+      ? rows.map(r => `<tr>
+          <td>${safe(r.date)}</td>
+          <td>${safe(r.type)}</td>
+          <td>${safe(r.description)}</td>
+          <td>${money(r.amount)}</td>
+        </tr>`).join("")
+      : '<tr><td colspan="4">No entries for this month.</td></tr>';
+  }
+
+  $("expenseForm").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    if (!sb || !currentUser) {
+      message("expenseMessage", "Please sign in first.", true);
+      return;
+    }
+
+    const amount = Number($("expenseAmount").value);
+
+    if (!amount || amount <= 0) {
+      message("expenseMessage", "Enter an amount greater than zero.", true);
+      return;
+    }
+
+    message("expenseMessage", "Saving expense...");
+
+    const { error } = await sb.from("expenses").insert({
+      owner_id: currentUser.id,
+      expense_date: $("expenseDate").value || isoToday(),
+      category: $("expenseCategory").value,
+      description: $("expenseDescription").value.trim(),
+      amount,
+      payment_method: $("expensePayment").value
+    });
+
+    if (error) {
+      message("expenseMessage", "Could not save: " + error.message, true);
+      return;
+    }
+
+    $("expenseForm").reset();
+    $("expenseDate").value = isoToday();
+    message("expenseMessage", "Expense saved successfully.");
+    await loadJournal();
+  });
+
+  $("journalDate").addEventListener("change", loadJournal);
+  $("ledgerMonth").addEventListener("change", loadJournal);
+  $("expenseDate").value = isoToday();
+  $("journalDate").value = isoToday();
+  $("ledgerMonth").value = isoToday().slice(0, 7);
+
 })();
