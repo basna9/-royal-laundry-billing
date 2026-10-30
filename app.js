@@ -32,8 +32,7 @@ function setPage(name) {
   if (name === "saved") renderSaved();
   if (name === "journal") loadJournal();
 }
-
-if(name==="journal") loadJournal();
+  
   document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
   $("billDate").value=isoToday();
   function addItem(item={name:"",qty:1,wash:0,iron:0,dry:0}){
