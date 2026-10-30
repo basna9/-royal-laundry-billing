@@ -42,11 +42,12 @@
         <form id="billForm" class="panel">
           <div class="section-head"><div><h2>Customer details</h2><p class="muted">Enter the details for this receipt.</p></div><span class="bill-chip" id="billNumberChip">Bill # —</span></div>
           <div class="fields two">
-            <label>Customer name<input id="customerName" required placeholder="Customer name"></label>
-            <label>Phone number<input id="customerPhone" inputmode="tel" placeholder="Phone number"></label>
-            <label>Bill date<input id="billDate" type="date" required></label>
-            <label>Delivery date<input id="deliveryDate" type="date"></label>
-          </div>
+  <label>Customer name<input id="customerName" required placeholder="Customer name"></label>
+  <label>Phone number<input id="customerPhone" inputmode="tel" placeholder="Phone number"></label>
+  <label>Bill number<input id="billNumber" type="text" required placeholder="e.g. RL-001"></label>
+  <label>Bill date<input id="billDate" type="date" required></label>
+  <label>Delivery date<input id="deliveryDate" type="date"></label>
+</div>
           <div class="section-head items-head"><div><h2>Items</h2><p class="muted">Add each item and its service rates.</p></div><button id="addItemBtn" class="secondary" type="button">＋ Add item</button></div>
           <div class="table-wrap"><table><thead><tr><th>Item</th><th>Qty</th><th>Washing ₹</th><th>Ironing ₹</th><th>Dry clean ₹</th><th>Total</th><th></th></tr></thead><tbody id="itemsBody"></tbody></table></div>
           <div class="total-row"><span>Grand total</span><strong id="grandTotal">₹0.00</strong></div>
