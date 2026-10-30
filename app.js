@@ -232,8 +232,9 @@ $("savedBills").querySelectorAll("[data-print]").forEach(btn =>
     if (!bill) return;
 
     openBill(bill.id);
-    $("billNumber").value = String(bill.bill_number ?? "");
-    updatePreview();
+$("billNumber").value = /^\d+$/.test(String(bill.bill_number ?? ""))
+  ? String(bill.bill_number)
+  : "";    updatePreview();
 
     setTimeout(() => window.print(), 500);
   })
