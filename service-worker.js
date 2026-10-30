@@ -1,5 +1,5 @@
 
-const CACHE = "royal-laundry-shell-v3";
+const CACHE = "royal-laundry-shell-v4";
 
 const CORE = [
   "./",
