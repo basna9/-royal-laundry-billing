@@ -241,6 +241,8 @@ $("savedBills").querySelectorAll("[data-print]").forEach(btn =>
   $("searchBills").addEventListener("input",renderSaved);
   function openBill(id){
     const b=billsCache.find(x=>x.id===id); if(!b)return;
+    console.log("Bill record:", b);
+console.log("Bill number from database:", b.bill_number);
 currentBillId = b.id;
 $("billNumber").value = String(b.bill_number ?? "");
 $("customerName").value = b.customer_name || "";
