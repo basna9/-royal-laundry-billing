@@ -239,17 +239,37 @@ $("savedBills").querySelectorAll("[data-print]").forEach(btn =>
   })
 );  }
   $("searchBills").addEventListener("input",renderSaved);
-  function openBill(id){
-    const b=billsCache.find(x=>x.id===id); if(!b)return;
-    console.log("Bill record:", b);
-console.log("Bill number from database:", b.bill_number);
-currentBillId = b.id;
-$("billNumber").value = String(b.bill_number ?? "");
-$("customerName").value = b.customer_name || "";
-$("customerPhone").value = b.customer_phone || "";    $("billDate").value=b.bill_date||isoToday();$("deliveryDate").value=b.delivery_date||"";$("notes").value=b.notes||"";
-    items=(b.items||[]).map((i,n)=>({id:String(n)+Math.random(),name:i.name||"",qty:i.quantity||1,wash:i.washing_rate||0,iron:i.ironing_rate||0,dry:i.dry_cleaning_rate||0}));
-    renderItems();setPage("new");updatePreview();
+ function openBill(id) {
+  const bill = billsCache.find(b => String(b.id) === String(id));
+  if (!bill) {
+    console.error("Saved bill not found:", id);
+    return;
   }
+
+  currentBillId = bill.id;
+
+  // Always display the human-readable bill number, never the UUID.
+  $("billNumber").value = String(bill.bill_number ?? "");
+
+  $("customerName").value = bill.customer_name || "";
+  $("customerPhone").value = bill.customer_phone || "";
+  $("billDate").value = bill.bill_date || isoToday();
+  $("deliveryDate").value = bill.delivery_date || "";
+  $("notes").value = bill.notes || "";
+
+  items = (bill.items || []).map((item, index) => ({
+    id: String(index) + Math.random(),
+    name: item.name || "",
+    qty: item.quantity || 1,
+    wash: item.washing_rate || 0,
+    iron: item.ironing_rate || 0,
+    dry: item.dry_cleaning_rate || 0
+  }));
+
+  renderItems();
+  setPage("new");
+  updatePreview();
+}
   window.addEventListener("online",()=>{$("syncStatus").textContent="Online";loadBills();});
   window.addEventListener("offline",()=>{$("syncStatus").textContent="Offline";});
   if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./service-worker.js").catch(()=>{}));
