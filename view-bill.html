@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#145da0">
+  <title>Royal Laundry | Digital Bill</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { background: #f3f6fa; }
+    .shared-bill { max-width: 650px; margin: 30px auto; }
+    .shared-bill .panel { background: white; padding: 24px; border-radius: 14px; }
+    .bill-heading { text-align: center; }
+    .bill-heading h1 { color: #145da0; }
+    .bill-total { font-size: 24px; text-align: right; font-weight: bold; }
+    .bill-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .bill-table th, .bill-table td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+    .bill-table th:last-child, .bill-table td:last-child { text-align: right; }
+    .bill-error { text-align: center; padding: 30px; }
+  </style>
+</head>
+<body>
+  <main class="shared-bill">
+    <section class="panel">
+      <div class="bill-heading">
+        <h1>ROYAL LAUNDRY</h1>
+        <p>& DRY CLEANERS</p>
+        <p>Areekode · HO: Amayur</p>
+        <p>Phone: 7994016808</p>
+      </div>
+
+      <hr>
+
+      <div id="billContent">
+        <p style="text-align:center">Loading your bill...</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    (async function () {
+      const content = document.getElementById("billContent");
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
+
+      if (!token) {
+        content.innerHTML = "<div class='bill-error'><h2>Invalid bill link</h2><p>Please contact Royal Laundry.</p></div>";
+        return;
+      }
+
+      const cfg = window.APP_CONFIG || {};
+
+      if (!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) {
+        content.textContent = "Bill service is temporarily unavailable.";
+        return;
+      }
+
+      const client = window.supabase.createClient(
+        cfg.SUPABASE_URL,
+        cfg.SUPABASE_ANON_KEY
+      );
+
+      const { data, error } = await client.rpc("get_shared_bill", {
+        p_token: token
+      });
+
+      if (error || !data) {
+        content.innerHTML = "<div class='bill-error'><h2>Bill not found</h2><p>Please contact Royal Laundry.</p></div>";
+        return;
+      }
+
+      const money = amount => new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR"
+      }).format(Number(amount) || 0);
+
+      const safe = value => String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;",
+        '"': "&quot;", "'": "&#39;"
+      }[c]));
+
+      const items = Array.isArray(data.items) ? data.items : [];
+
+      content.innerHTML = `
+        <p><strong>Bill No:</strong> ${safe(data.bill_number || "—")}</p>
+        <p><strong>Date:</strong> ${safe(data.bill_date || "—")}</p>
+        <p><strong>Customer:</strong> ${safe(data.customer_name || "—")}</p>
+        <p><strong>Phone:</strong> ${safe(data.customer_phone || "—")}</p>
+        <hr>
+        <h3>Items</h3>
+        <table class="bill-table">
+          <thead>
+            <tr><th>Item</th><th>Qty</th><th>Amount</th></tr>
+          </thead>
+          <tbody>
+            ${items.map(item => {
+              const amount = Number(item.line_total) ||
+                (Number(item.quantity) || 0) *
+                ((Number(item.washing_rate) || 0) +
+                 (Number(item.ironing_rate) || 0) +
+                 (Number(item.dry_cleaning_rate) || 0));
+
+              return `<tr>
+                <td>${safe(item.name)}</td>
+                <td>${Number(item.quantity) || 0}</td>
+                <td>${money(amount)}</td>
+              </tr>`;
+            }).join("")}
+          </tbody>
+        </table>
+        <p class="bill-total">Total: ${money(data.total)}</p>
+        <p><strong>Delivery date:</strong> ${safe(data.delivery_date || "—")}</p>
+        <hr>
+        <p style="text-align:center">Thank you for choosing Royal Laundry!</p>
+        <p style="text-align:center">We appreciate your trust.</p>
+      `;
+    })();
+  </script>
+</body>
+</html>
