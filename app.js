@@ -84,7 +84,7 @@ function updatePreview(){
     </tr>`)
     .join("");
 }
-```
+
   ["customerName","customerPhone","billNumber","billDate","deliveryDate"].forEach(id=>$(id).addEventListener("input",updatePreview));
   $("addItemBtn").addEventListener("click",()=>addItem());
   $("resetBillBtn").addEventListener("click",()=>resetForm());
