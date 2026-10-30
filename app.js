@@ -226,8 +226,18 @@ if (!Number.isSafeInteger(billNumber) || billNumber < 1) {
     const matches=billsCache.filter(b=>[b.bill_number,b.customer_name,b.customer_phone,b.bill_date].some(v=>String(v||"").toLowerCase().includes(query)));
     $("savedBills").innerHTML=matches.length?matches.map(b=>`<article class="bill-card"><div><strong>Bill #${safe(b.bill_number||"—")} · ${safe(b.customer_name)}</strong><p class="muted">${safe(b.bill_date)} · ${safe(b.customer_phone||"No phone")}</p><strong>${money(b.total)}</strong></div><div class="actions"><button type="button" data-open="${safe(b.id)}">Open</button><button type="button" class="secondary" data-print="${safe(b.id)}">Print</button></div></article>`).join(""):'<p class="muted">No matching bills found.</p>';
     $("savedBills").querySelectorAll("[data-open]").forEach(btn=>btn.addEventListener("click",()=>openBill(btn.dataset.open)));
-    $("savedBills").querySelectorAll("[data-print]").forEach(btn=>btn.addEventListener("click",()=>{openBill(btn.dataset.print);setTimeout(()=>window.print(),100);}));
-  }
+$("savedBills").querySelectorAll("[data-print]").forEach(btn =>
+  btn.addEventListener("click", () => {
+    const bill = billsCache.find(b => b.id === btn.dataset.print);
+    if (!bill) return;
+
+    openBill(bill.id);
+    $("billNumber").value = String(bill.bill_number ?? "");
+    updatePreview();
+
+    setTimeout(() => window.print(), 500);
+  })
+);  }
   $("searchBills").addEventListener("input",renderSaved);
   function openBill(id){
     const b=billsCache.find(x=>x.id===id); if(!b)return;
