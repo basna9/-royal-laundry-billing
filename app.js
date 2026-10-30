@@ -249,8 +249,9 @@ $("savedBills").querySelectorAll("[data-print]").forEach(btn =>
   currentBillId = bill.id;
 
   // Always display the human-readable bill number, never the UUID.
-  $("billNumber").value = String(bill.bill_number ?? "");
-
+$("billNumber").value = /^\d+$/.test(String(bill.bill_number ?? ""))
+  ? String(bill.bill_number)
+  : "";
   $("customerName").value = bill.customer_name || "";
   $("customerPhone").value = bill.customer_phone || "";
   $("billDate").value = bill.bill_date || isoToday();
