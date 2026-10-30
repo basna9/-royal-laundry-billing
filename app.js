@@ -13,7 +13,26 @@
   function message(id, text, error=false){ const el=$(id); if(el){el.textContent=text;el.style.color=error?"#b42318":"#145da0";} }
   function showAuth(){ $("authView").classList.remove("hidden"); $("appView").classList.add("hidden"); $("logoutBtn").classList.add("hidden"); }
   function showApp(user){ currentUser=user; $("authView").classList.add("hidden"); $("appView").classList.remove("hidden"); $("logoutBtn").classList.remove("hidden"); $("accountInfo").textContent="Signed in as "+(user.email||"account"); setPage("new"); loadBills(); }
-  function setPage(name){ document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden")); $(name+"Page").classList.remove("hidden"); document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.page===name)); $("pageTitle").textContent=({new:"New bill",saved:"Saved bills",settings:"Settings"})[name]; if(name==="saved") renderSaved();
+  
+function setPage(name) {
+  document.querySelectorAll(".page").forEach(p => p.classList.add("hidden"));
+  $(name + "Page").classList.remove("hidden");
+
+  document.querySelectorAll(".tab").forEach(b =>
+    b.classList.toggle("active", b.dataset.page === name)
+  );
+
+  $("pageTitle").textContent = ({
+    new: "New bill",
+    saved: "Saved bills",
+    settings: "Settings",
+    journal: "Journal & Ledger"
+  })[name];
+
+  if (name === "saved") renderSaved();
+  if (name === "journal") loadJournal();
+}
+
 if(name==="journal") loadJournal();
   document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>setPage(b.dataset.page)));
   $("billDate").value=isoToday();
