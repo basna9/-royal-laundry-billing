@@ -88,49 +88,98 @@ function setPage(name) {
     if(error){message("authMessage",authError(error),true);return;}
     if(data.user){message("authMessage","Account created. If email confirmation is enabled, confirm your email, then sign in.");}
   });
-  $("logoutBtn").addEventListener("click",async()=>{if(sb)await sb.auth.signOut();currentUser=null;showAuth();});
-  $("billForm").addEventListener("submit",async e=>{
+  $("logoutBtn").addEventListener("click", async () => {
+    if (sb) await sb.auth.signOut();
+    currentUser = null;
+    showAuth();
+  });   $("billForm").addEventListener("submit", async e => {
     e.preventDefault();
-    if(!sb||!currentUser){message("billMessage","Sign in and configure Supabase before saving bills.",true);return;}
-    const validItems=items.filter(i=>i.name.trim()).map(i=>({name:i.name.trim(),quantity:Number(i.qty)||1,washing_rate:Number(i.wash)||0,ironing_rate:Number(i.iron)||0,dry_cleaning_rate:Number(i.dry)||0,line_total:calcItem(i)}));
-    if(!validItems.length){message("billMessage","Add at least one item name.",true);return;}
-    const payload={owner_id:currentUser.id,customer_name:$("customerName").value.trim(),customer_phone:$("customerPhone").value.trim(),bill_date:$("billDate").value,delivery_date:$("deliveryDate").value||null,notes:$("notes").value.trim(),items:validItems,total:getTotal()};
-    message("billMessage","Saving bill…");
+
+    if (!sb || !currentUser) {
+      message("billMessage", "Sign in and configure Supabase before saving bills.", true);
+      return;
+    }
+
+    const validItems = items
+      .filter(i => i.name.trim())
+      .map(i => ({
+        name: i.name.trim(),
+        quantity: Number(i.qty) || 1,
+        washing_rate: Number(i.wash) || 0,
+        ironing_rate: Number(i.iron) || 0,
+        dry_cleaning_rate: Number(i.dry) || 0,
+        line_total: calcItem(i)
+      }));
+
+    if (!validItems.length) {
+      message("billMessage", "Add at least one item name.", true);
+      return;
+    }
+
+    const payload = {
+      owner_id: currentUser.id,
+      customer_name: $("customerName").value.trim(),
+      customer_phone: $("customerPhone").value.trim(),
+      bill_date: $("billDate").value,
+      delivery_date: $("deliveryDate").value || null,
+      notes: $("notes").value.trim(),
+      items: validItems,
+      total: getTotal()
+    };
+
+    message("billMessage", "Saving bill…");
+
     let result;
-    if(currentBillId) result=await sb.from("bills").update(payload).eq("id",currentBillId).select().single();
-    else result=await sb.from("bills").insert(payload).select().single();
-    if(result.error){message("billMessage",authError(result.error),true);currentBillId = result.data.id;
 
-const shareToken = result.data.share_token;
+    if (currentBillId) {
+      result = await sb.from("bills")
+        .update(payload)
+        .eq("id", currentBillId)
+        .select()
+        .single();
+    } else {
+      result = await sb.from("bills")
+        .insert(payload)
+        .select()
+        .single();
+    }
 
-message("billMessage", "Bill saved successfully.");
+    if (result.error) {
+      message("billMessage", authError(result.error), true);
+      return;
+    }
 
-await loadBills();
-updatePreview();
+    currentBillId = result.data.id;
+    const shareToken = result.data.share_token;
 
-if (shareToken && $("customerPhone").value.trim()) {
-  const billLink = window.location.origin +
-    "/view-bill.html?token=" + shareToken;
+    message("billMessage", "Bill saved successfully.");
+    await loadBills();
+    updatePreview();
 
-  const smsText = encodeURIComponent(
-    "Royal Laundry & Dry Cleaners\n" +
-    "Your bill is ready!\n" +
-    "Bill No: " + (result.data.bill_number || currentBillId) + "\n" +
-    "Total: " + money(result.data.total) + "\n" +
-    "View your bill: " + billLink +
-    "\nThank you!"
-  );
+    if (shareToken && $("customerPhone").value.trim()) {
+      const billLink = window.location.origin +
+        "/view-bill.html?token=" + shareToken;
 
-  const phone = $("customerPhone").value.trim();
-const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const smsText = encodeURIComponent(
+        "Royal Laundry & Dry Cleaners\n" +
+        "Your bill is ready!\n" +
+        "Bill No: " + (result.data.bill_number || currentBillId) + "\n" +
+        "Total: " + money(result.data.total) + "\n" +
+        "View your bill: " + billLink +
+        "\nThank you!"
+      );
 
-const smsLink = isIOS
-  ? "sms:" + phone + "&body=" + smsText
-  : "sms:" + phone + "?body=" + smsText;
+      const phone = $("customerPhone").value.trim();
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 
-window.location.href = smsLink;
-}
-  });
+      const smsLink = isIOS
+        ? "sms:" + phone + "&body=" + smsText
+        : "sms:" + phone + "?body=" + smsText;
+
+      window.location.href = smsLink;
+    }
+  });                                 
+
   async function loadBills(){
     if(!sb||!currentUser){billsCache=[];renderSaved();return;}
     $("syncStatus").textContent=navigator.onLine?"Connected":"Offline";
