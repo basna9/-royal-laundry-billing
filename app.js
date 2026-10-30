@@ -57,7 +57,7 @@ function setPage(name) {
     $("itemsBody").querySelectorAll("[data-remove]").forEach(b=>b.addEventListener("click",()=>{items=items.filter(i=>i.id!==b.dataset.remove);renderItems();}));
     updatePreview();
   }
- ```javascript
+ 
 function updatePreview(){
   const total = getTotal();
 
@@ -85,7 +85,7 @@ function updatePreview(){
     .join("");
 }
 ```
-  ["customerName","customerPhone","billDate","deliveryDate"].forEach(id=>$(id).addEventListener("input",updatePreview));
+  ["customerName","customerPhone","billNumber","billDate","deliveryDate"].forEach(id=>$(id).addEventListener("input",updatePreview));
   $("addItemBtn").addEventListener("click",()=>addItem());
   $("resetBillBtn").addEventListener("click",()=>resetForm());
   $("printBtn").addEventListener("click",()=>window.print());
@@ -136,9 +136,22 @@ function updatePreview(){
       message("billMessage", "Add at least one item name.", true);
       return;
     }
+const billNumberText = $("billNumber").value.trim();
 
+if (!/^\d+$/.test(billNumberText)) {
+  message("billMessage", "Enter a valid numeric bill number.", true);
+  return;
+}
+
+const billNumber = Number(billNumberText);
+
+if (!Number.isSafeInteger(billNumber) || billNumber < 1) {
+  message("billMessage", "Bill number must be a positive whole number.", true);
+  return;
+}
     const payload = {
       owner_id: currentUser.id,
+      bill_number: billNumber,
       customer_name: $("customerName").value.trim(),
       customer_phone: $("customerPhone").value.trim(),
       bill_date: $("billDate").value,
@@ -218,8 +231,10 @@ function updatePreview(){
   $("searchBills").addEventListener("input",renderSaved);
   function openBill(id){
     const b=billsCache.find(x=>x.id===id); if(!b)return;
-    currentBillId=b.id;$("customerName").value=b.customer_name||"";$("customerPhone").value=b.customer_phone||"";
-    $("billDate").value=b.bill_date||isoToday();$("deliveryDate").value=b.delivery_date||"";$("notes").value=b.notes||"";
+currentBillId = b.id;
+$("billNumber").value = String(b.bill_number ?? "");
+$("customerName").value = b.customer_name || "";
+$("customerPhone").value = b.customer_phone || "";    $("billDate").value=b.bill_date||isoToday();$("deliveryDate").value=b.delivery_date||"";$("notes").value=b.notes||"";
     items=(b.items||[]).map((i,n)=>({id:String(n)+Math.random(),name:i.name||"",qty:i.quantity||1,wash:i.washing_rate||0,iron:i.ironing_rate||0,dry:i.dry_cleaning_rate||0}));
     renderItems();setPage("new");updatePreview();
   }
