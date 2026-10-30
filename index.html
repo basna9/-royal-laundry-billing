@@ -35,6 +35,7 @@
         <button class="tab active" data-page="new">＋ New Bill</button>
         <button class="tab" data-page="saved">▤ Saved Bills</button>
         <button class="tab" data-page="settings">⚙ Settings</button>
+        <button class="tab" data-page="journal">📒 Journal & Ledger</button>
       </nav>
 
       <section id="newPage" class="page">
@@ -77,6 +78,95 @@
           <h3>Link another phone</h3><p class="muted">The secure one-time linking flow is planned but not enabled in this starter. Do not use an improvised code to share access.</p>
           <button type="button" class="secondary" id="linkInfoBtn">How linking will work</button><p id="linkInfo" class="message"></p>
           <hr><h3>Data safety</h3><p class="muted">Bills are stored in the cloud. Keep your login secure and make regular backups once backup/export is implemented.</p>
+        </section>
+      </section>
+            <section id="journalPage" class="page hidden">
+        <section class="panel">
+          <h2>📒 Daily Journal</h2>
+          <p class="muted">Track your daily laundry income and expenses.</p>
+          <label>
+            Select date
+            <input type="date" id="journalDate">
+          </label>
+          <div class="total-row">
+            <span>Income</span>
+            <strong id="journalIncome">₹0.00</strong>
+          </div>
+          <div class="total-row">
+            <span>Expenses</span>
+            <strong id="journalExpenses">₹0.00</strong>
+          </div>
+          <div class="total-row">
+            <span>Profit / Loss</span>
+            <strong id="journalProfit">₹0.00</strong>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>➕ Record an Expense</h2>
+          <p class="muted">Record detergent, electricity, rent, salaries, and other expenses.</p>
+          <form id="expenseForm">
+            <label>
+              Expense date
+              <input type="date" id="expenseDate" required>
+            </label>
+            <label>
+              Category
+              <select id="expenseCategory" required>
+                <option value="">Choose category</option>
+                <option value="Detergent">Detergent</option>
+                <option value="Electricity">Electricity</option>
+                <option value="Water">Water</option>
+                <option value="Rent">Rent</option>
+                <option value="Salary">Salary</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Transport">Transport</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+            <label>
+              Description
+              <input type="text" id="expenseDescription" placeholder="Optional details">
+            </label>
+            <label>
+              Amount (₹)
+              <input type="number" id="expenseAmount" min="0.01" step="0.01" required placeholder="Enter amount">
+            </label>
+            <label>
+              Payment method
+              <select id="expensePayment">
+                <option value="">Not specified</option>
+                <option value="Cash">Cash</option>
+                <option value="UPI">UPI</option>
+                <option value="Bank">Bank transfer</option>
+                <option value="Card">Card</option>
+              </select>
+            </label>
+            <button type="submit">Save Expense</button>
+            <p id="expenseMessage" class="message" role="status"></p>
+          </form>
+        </section>
+        <section class="panel">
+          <h2>📚 Monthly Ledger</h2>
+          <label>
+            Select month
+            <input type="month" id="ledgerMonth">
+          </label>
+          <div id="ledgerSummary">
+            <p class="muted">Monthly totals will appear here.</p>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Transaction</th>
+                  <th>Category</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerBody"></tbody>
+            </table>
+          </div>
         </section>
       </section>
     </section>
