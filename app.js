@@ -71,7 +71,7 @@ function updatePreview(){
   $("previewDelivery").textContent = $("deliveryDate").value || "—";
 const notes = $("notes").value.trim();
 $("previewNotes").textContent = notes;
-$("previewNotesRow").hidden = !notes;
+$("previewNotesRow").style.display = notes ? "block" : "none";
   const billNo = $("billNumber").value.trim() || "—";
 
   $("previewBillNo").textContent = billNo;
