@@ -69,7 +69,9 @@ function updatePreview(){
 
   $("previewDate").textContent = $("billDate").value || "—";
   $("previewDelivery").textContent = $("deliveryDate").value || "—";
-
+const notes = $("notes").value.trim();
+$("previewNotes").textContent = notes;
+$("previewNotesRow").hidden = !notes;
   const billNo = $("billNumber").value.trim() || "—";
 
   $("previewBillNo").textContent = billNo;
@@ -85,7 +87,7 @@ function updatePreview(){
     .join("");
 }
 
-  ["customerName","customerPhone","billNumber","billDate","deliveryDate"].forEach(id=>$(id).addEventListener("input",updatePreview));
+["customerName","customerPhone","billNumber","billDate","deliveryDate","notes"].forEach(id=>$(id).addEventListener("input",updatePreview));
   $("addItemBtn").addEventListener("click",()=>addItem());
   $("resetBillBtn").addEventListener("click",()=>resetForm());
   $("printBtn").addEventListener("click",()=>window.print());
