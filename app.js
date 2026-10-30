@@ -57,13 +57,34 @@ function setPage(name) {
     $("itemsBody").querySelectorAll("[data-remove]").forEach(b=>b.addEventListener("click",()=>{items=items.filter(i=>i.id!==b.dataset.remove);renderItems();}));
     updatePreview();
   }
-  function updatePreview(){
-    const total=getTotal(); $("grandTotal").textContent=money(total); $("previewTotal").textContent=money(total);
-    $("previewCustomer").textContent=$("customerName").value||"—"; $("previewPhone").textContent=$("customerPhone").value||"—";
-    $("previewDate").textContent=$("billDate").value||"—"; $("previewDelivery").textContent=$("deliveryDate").value||"—";
-    $("previewBillNo").textContent=currentBillId||"New"; $("billNumberChip").textContent="Bill # "+(currentBillId||"New");
-    $("previewItems").innerHTML=items.filter(i=>i.name.trim()).map(i=>`<tr><td>${safe(i.name)}</td><td>${Number(i.qty)||0}</td><td>${money(calcItem(i))}</td></tr>`).join("");
-  }
+ ```javascript
+function updatePreview(){
+  const total = getTotal();
+
+  $("grandTotal").textContent = money(total);
+  $("previewTotal").textContent = money(total);
+
+  $("previewCustomer").textContent = $("customerName").value || "—";
+  $("previewPhone").textContent = $("customerPhone").value || "—";
+
+  $("previewDate").textContent = $("billDate").value || "—";
+  $("previewDelivery").textContent = $("deliveryDate").value || "—";
+
+  const billNo = $("billNumber").value.trim() || "—";
+
+  $("previewBillNo").textContent = billNo;
+  $("billNumberChip").textContent = "Bill # " + billNo;
+
+  $("previewItems").innerHTML = items
+    .filter(i => i.name.trim())
+    .map(i => `<tr>
+      <td>${safe(i.name)}</td>
+      <td>${Number(i.qty) || 0}</td>
+      <td>${money(calcItem(i))}</td>
+    </tr>`)
+    .join("");
+}
+```
   ["customerName","customerPhone","billDate","deliveryDate"].forEach(id=>$(id).addEventListener("input",updatePreview));
   $("addItemBtn").addEventListener("click",()=>addItem());
   $("resetBillBtn").addEventListener("click",()=>resetForm());
