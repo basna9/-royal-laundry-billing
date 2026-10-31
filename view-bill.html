@@ -119,9 +119,16 @@ margin: 0 auto 8px;
             }).join("")}
           </tbody>
         </table>
-        <p class="bill-total">Total: ${money(data.total)}</p>
-        <p><strong>Delivery date:</strong> ${safe(data.delivery_date || "—")}</p>
-        <hr>
+       <p class="bill-total">Total: ${money(data.total)}</p>
+<p><strong>Delivery date:</strong> ${safe(data.delivery_date || "—")}</p>
+
+${data.notes && String(data.notes).trim() ? `
+  <hr>
+  <p><strong>Notes:</strong></p>
+  <p style="white-space:pre-wrap;">${safe(data.notes)}</p>
+` : ""}
+
+<hr>
         <p style="text-align:center">Thank you for choosing Royal Laundry!</p>
         <p style="text-align:center">We appreciate your trust.</p>
       `;
