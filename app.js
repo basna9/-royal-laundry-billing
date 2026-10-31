@@ -69,8 +69,12 @@ function updatePreview(){
 
   $("previewDate").textContent = $("billDate").value || "—";
   $("previewDelivery").textContent = $("deliveryDate").value || "—";
-  $("previewPaymentStatus").textContent =
-  $("paymentStatus").value || "PAYMENT PENDING";
+  const paymentStatus = $("paymentStatus").value || "PAYMENT PENDING";
+const paymentBadge = $("previewPaymentStatus");
+
+paymentBadge.textContent = paymentStatus;
+paymentBadge.classList.toggle("paid", paymentStatus === "PAID");
+paymentBadge.classList.toggle("pending", paymentStatus === "PAYMENT PENDING");
 const notes = $("notes").value.trim();
 $("previewNotes").textContent = notes;
 $("previewNotesRow").style.display = notes ? "block" : "none";
