@@ -75,10 +75,23 @@ margin: 0 auto 8px;
         p_token: token
       });
 
-      if (error || !data) {
-        content.innerHTML = "<div class='bill-error'><h2>Bill not found</h2><p>Please contact Royal Laundry.</p></div>";
-        return;
-      }
+      if (error) {
+  content.innerHTML = `
+    <div class="bill-error">
+      <h2>Bill loading error</h2>
+      <p>${String(error.message || error).replace(/[&<>"']/g, "")}</p>
+    </div>`;
+  return;
+}
+
+if (!data) {
+  content.innerHTML = `
+    <div class="bill-error">
+      <h2>Bill not found</h2>
+      <p>No bill was returned for this sharing token.</p>
+    </div>`;
+  return;
+}
 
       const money = amount => new Intl.NumberFormat("en-IN", {
         style: "currency",
