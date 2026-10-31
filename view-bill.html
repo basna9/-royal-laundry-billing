@@ -104,6 +104,8 @@ if (!data) {
       }[c]));
 
       const items = Array.isArray(data.items) ? data.items : [];
+      const paymentStatus = data.payment_status || "PAYMENT PENDING";
+const paymentClass = paymentStatus === "PAID" ? "paid" : "pending";
 
       content.innerHTML = `
         <p><strong>Bill No:</strong> ${safe(data.bill_number || "—")}</p>
@@ -133,6 +135,12 @@ if (!data) {
           </tbody>
         </table>
        <p class="bill-total">Total: ${money(data.total)}</p>
+       <p style="text-align:right;">
+  <strong>Payment status:</strong>
+  <span class="payment-status ${paymentClass}">
+    ${safe(paymentStatus)}
+  </span>
+</p>
 <p><strong>Delivery date:</strong> ${safe(data.delivery_date || "—")}</p>
 
 ${data.notes && String(data.notes).trim() ? `
