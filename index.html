@@ -46,6 +46,12 @@
   <label>Bill number<input id="billNumber" type="text" required placeholder="e.g. 7"></label>
   <label>Bill date<input id="billDate" type="date" required></label>
   <label>Delivery date<input id="deliveryDate" type="date"></label>
+            <label>Payment status
+  <select id="paymentStatus">
+    <option value="PAYMENT PENDING" selected>Payment Pending</option>
+    <option value="PAID">Paid</option>
+  </select>
+</label>
 </div>
           <div class="section-head items-head"><div><h2>Items</h2><p class="muted">Add each item and its service rates.</p></div><button id="addItemBtn" class="secondary" type="button">＋ Add item</button></div>
           <div class="table-wrap"><table><thead><tr><th>Item</th><th>Qty</th><th>Washing ₹</th><th>Ironing ₹</th><th>Dry clean ₹</th><th>Total</th><th></th></tr></thead><tbody id="itemsBody"></tbody></table></div>
