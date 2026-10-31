@@ -82,6 +82,22 @@ footer{text-align:center;padding:20px;color:var(--muted);font-size:12px}
   .receipt .table-wrap{overflow:visible}
   .receipt table{font-size:12px}
   .receipt td,.receipt th{white-space:normal}
+  #previewPaymentStatus {
+  display: inline-block !important;
+  visibility: visible !important;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+#previewPaymentStatus.paid {
+  color: #166534 !important;
+  background: #dcfce7 !important;
+}
+
+#previewPaymentStatus.pending {
+  color: #854d0e !important;
+  background: #fef3c7 !important;
+}
   #newPage h1{display:none!important}
 }
 /* Royal Laundry logo */
