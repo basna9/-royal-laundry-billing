@@ -158,6 +158,7 @@ if (!Number.isSafeInteger(billNumber) || billNumber < 1) {
       customer_phone: $("customerPhone").value.trim(),
       bill_date: $("billDate").value,
       delivery_date: $("deliveryDate").value || null,
+      payment_status: $("paymentStatus").value || "PAYMENT PENDING",
       notes: $("notes").value.trim(),
       items: validItems,
       total: getTotal()
