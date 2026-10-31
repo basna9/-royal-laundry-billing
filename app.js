@@ -281,6 +281,7 @@ $("billNumber").value = /^\d+$/.test(String(bill.bill_number ?? ""))
   $("customerPhone").value = bill.customer_phone || "";
   $("billDate").value = bill.bill_date || isoToday();
   $("deliveryDate").value = bill.delivery_date || "";
+   $("paymentStatus").value = bill.payment_status || "PAYMENT PENDING";
   $("notes").value = bill.notes || "";
 
   items = (bill.items || []).map((item, index) => ({
