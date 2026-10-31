@@ -1,5 +1,5 @@
 
-const CACHE = "royal-laundry-shell-v4";
+const CACHE = "royal-laundry-shell-v5";
 
 const CORE = [
   "./",
@@ -32,30 +32,26 @@ self.addEventListener("activate", event => {
 });
 
 self.addEventListener("fetch", event => {
-  const url = new URL(event.request.url);
+  const request = event.request;
+  const url = new URL(request.url);
 
   if (
-    event.request.method !== "GET" ||
+    request.method !== "GET" ||
     url.origin !== self.location.origin
   ) return;
 
   event.respondWith(
-    caches.open(CACHE).then(async cache => {
-      const cached = await cache.match(event.request);
-
-      if (cached) return cached;
-
-      try {
-        const response = await fetch(event.request);
-
+    fetch(request)
+      .then(response => {
         if (response.ok) {
-          cache.put(event.request, response.clone());
+          const copy = response.clone();
+          caches.open(CACHE).then(cache => cache.put(request, copy));
         }
-
         return response;
-      } catch (error) {
-        return cache.match("./index.html");
-      }
-    })
+      })
+      .catch(async () => {
+        const cached = await caches.match(request);
+        return cached || caches.match("./index.html");
+      })
   );
 });
