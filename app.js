@@ -69,6 +69,8 @@ function updatePreview(){
 
   $("previewDate").textContent = $("billDate").value || "—";
   $("previewDelivery").textContent = $("deliveryDate").value || "—";
+  $("previewPaymentStatus").textContent =
+  $("paymentStatus").value || "PAYMENT PENDING";
 const notes = $("notes").value.trim();
 $("previewNotes").textContent = notes;
 $("previewNotesRow").style.display = notes ? "block" : "none";
@@ -88,7 +90,7 @@ $("previewNotesRow").style.display = notes ? "block" : "none";
 }
 
 ["customerName","customerPhone","billNumber","billDate","deliveryDate","notes"].forEach(id=>$(id).addEventListener("input",updatePreview));
-  $("addItemBtn").addEventListener("click",()=>addItem());
+$("paymentStatus").addEventListener("change", updatePreview);  $("addItemBtn").addEventListener("click",()=>addItem());
   $("resetBillBtn").addEventListener("click",()=>resetForm());
   $("printBtn").addEventListener("click",()=>window.print());
   $("linkInfoBtn").addEventListener("click",()=>message("linkInfo","Device linking is not enabled yet. Implement the secure Edge Function before sharing account access."));
