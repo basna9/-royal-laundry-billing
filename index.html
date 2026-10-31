@@ -56,9 +56,11 @@
           <div class="section-head items-head"><div><h2>Items</h2><p class="muted">Add each item and its service rates.</p></div><button id="addItemBtn" class="secondary" type="button">＋ Add item</button></div>
           <div class="table-wrap"><table><thead><tr><th>Item</th><th>Qty</th><th>Washing ₹</th><th>Ironing ₹</th><th>Dry clean ₹</th><th>Total</th><th></th></tr></thead><tbody id="itemsBody"></tbody></table></div>
           <div class="total-row"><span>Grand total</span><strong id="grandTotal">₹0.00</strong></div>
-          <p style="text-align:center; margin:12px 0;">
+         <p style="text-align:center; margin:12px 0;">
   Payment status:
-  <strong id="previewPaymentStatus">PAYMENT PENDING</strong>
+  <strong id="previewPaymentStatus" class="payment-status pending">
+    PAYMENT PENDING
+  </strong>
 </p>
           <label>Notes (optional)<textarea id="notes" rows="2" placeholder="Special instructions"></textarea></label>
           <div class="button-row"><button type="submit" id="saveBillBtn">Save bill</button><button type="button" class="secondary" id="resetBillBtn">Clear form</button></div>
